@@ -1,10 +1,30 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { useState, useContext } from 'react';
+import { UtilsContext } from './context';
 
 export default function Usuarios(props) {
-    const [text, setText] = useState("");
-    var historico = [];
+  const {utils, setUtils} = useContext(UtilsContext);
+
+  const [text, setText] = useState("");
+  const [historicText, setHistoricText] = useState("");
+
+  function setTextToHistoric(text){
+    var equation = text;
+    var result = eval(text);
+    setText(eval(text));
+    setHistoricText(equation + " = " + result);
+    
+    if(utils.historicText)
+      setUtils({...utils, historicText: [...utils.historicText, equation + " = " + result]});
+    
+    else
+      setUtils({...utils, historicText: [equation + " = " + result]});
+  }
+
+  function goToHistoric(){
+    props.navigation.navigate("Historico");
+  }
 
   return (
     <View style={styles.container}>
@@ -18,7 +38,7 @@ export default function Usuarios(props) {
             <TouchableOpacity style = {styles.touchable} onPress = {() => setText(text + " - ")}><Text>-</Text></TouchableOpacity>
             <TouchableOpacity style = {styles.touchable} onPress = {() => setText(text + " / ")}><Text>/</Text></TouchableOpacity>
             <TouchableOpacity style = {styles.touchable} onPress = {() => setText(text + " * ")}><Text>x</Text></TouchableOpacity>
-            <TouchableOpacity style = {styles.touchable} onPress = {() => setText(eval(text))}><Text>=</Text></TouchableOpacity>
+            <TouchableOpacity style = {styles.touchable} onPress = {() => setTextToHistoric(text)}><Text>=</Text></TouchableOpacity>
         </View>
 
         <View style = {styles.myContainer2}>
@@ -47,7 +67,7 @@ export default function Usuarios(props) {
             <TouchableOpacity style = {styles.touchable2} onPress = {() => setText("")}>
                 <Text>Limpar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style = {styles.touchable2} onPress = {() => props.navigation.navigate("Historico")}>
+            <TouchableOpacity style = {styles.touchable2} onPress = {() => goToHistoric()}>
                 <Text>Histórico</Text>
             </TouchableOpacity>
         </View>
